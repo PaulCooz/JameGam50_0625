@@ -6,11 +6,11 @@ namespace JamSpace
     public sealed class LevelManager : MonoBehaviour
     {
         [SerializeField]
-        private CommandView commandPartView;
+        private CopyView copyPartView;
 
-        public void OpenCommandResolving()
+        public void OpenCopy()
         {
-            commandPartView.Show();
+            copyPartView.Show();
         }
     }
 }

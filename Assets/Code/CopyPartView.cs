@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace JamSpace
 {
-    public sealed class CommandPartView : MonoBehaviour
+    public sealed class CopyPartView : MonoBehaviour
     {
         [SerializeField]
         private RectTransform inputParent;
@@ -16,21 +17,19 @@ namespace JamSpace
         [SerializeField]
         private CommandInOutView inOutPrefab;
         [SerializeField]
-        private CommandOperatorView operatorPrefab;
+        private CopyOperatorView operatorPrefab;
 
         private bool[] _currentInput;
-        private CommandData _data;
+        private CopyData _data;
         private List<CommandInOutView> _inputButtons;
         private List<CommandInOutView> _outputButtons;
-        private List<CommandOperatorView> _gridButtons;
+        private List<CopyOperatorView> _gridButtons;
 
-        public void SetupCommandResolving()
+        public void SetupCommandCopy(CopyData data, bool hideOps)
         {
-            _data = new(3, 2, new[]
-            {
-                new[] { Operator.Not, Operator.Empty, Operator.AndLeft },
-                new[] { Operator.OrRight, Operator.Empty, Operator.Empty },
-            });
+            _data = data;
+            if (!hideOps)
+                _data.SetAllEmpty();
 
             var spacing =
                 new Vector2((_data.width - 1) * gridParent.spacing.x, (_data.height - 1) * gridParent.spacing.y);
@@ -72,7 +71,7 @@ namespace JamSpace
             for (var j = 0; j < _data.width; j++)
             {
                 var operatorView = Instantiate(operatorPrefab, gridParent.transform);
-                operatorView.Setup(i, j, _data);
+                operatorView.Setup(i, j, _data, hideOps);
                 operatorView.RefreshView();
                 operatorView.onClick.AddListener(() =>
                 {
@@ -106,6 +105,19 @@ namespace JamSpace
                     Destroy(b.gameObject);
                 objects.Clear();
             }
+        }
+
+        public bool[] Calc(bool[] input) => _data.Calc(input);
+
+        public void SetInput(bool[] input)
+        {
+            for (var i = 0; i < _currentInput.Length; i++)
+            {
+                _currentInput[i] = input[i];
+                _inputButtons[i].RefreshView(_currentInput[i]);
+            }
+
+            RefreshOutputView();
         }
     }
 }
