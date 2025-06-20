@@ -8,30 +8,30 @@ namespace JamSpace
     public sealed class CopyOperatorView : Button
     {
         private int _h, _w;
-        private bool _hidden;
-        private CopyData _data;
+        private State _state;
+        private LevelData _data;
 
         [SerializeField]
         private TMP_Text tmp;
 
-        public void Setup(int h, int w, CopyData data, bool hidden)
+        public void Setup(int h, int w, LevelData data, bool hidden)
         {
             _h = h;
             _w = w;
             _data = data;
-            _hidden = hidden;
+            _state = hidden ? State.Hidden : State.Usable;
         }
 
         public void Click()
         {
-            if (_hidden)
+            if (_state is not State.Usable)
                 return;
             _data[_h, _w] = _data[_h, _w].MoveNext(_w, _data.width);
         }
 
         public void RefreshView()
         {
-            tmp.text = _hidden
+            tmp.text = _state is State.Hidden
                 ? "?"
                 : _data[_h, _w] switch
                 {
@@ -43,6 +43,19 @@ namespace JamSpace
                     Operator.OrRight => "|-",
                     _ => throw new ArgumentOutOfRangeException()
                 };
+        }
+
+        public void HintOpen()
+        {
+            _state = State.Hinted;
+            RefreshView();
+        }
+
+        private enum State
+        {
+            Usable,
+            Hidden,
+            Hinted,
         }
     }
 }

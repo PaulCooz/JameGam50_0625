@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0cbb2a242ad4272844f7176e08c2dea, type: 3}
   m_Name: Level1Copy
   m_EditorClassIdentifier: 
-  minMaxWidth: {x: 2, y: 2}
-  minMaxHeight: {x: 1, y: 1}
+  minMaxWidth: {x: 3, y: 3}
+  minMaxHeight: {x: 3, y: 3}
   minMaxOpPerRow: {x: 0, y: 2}

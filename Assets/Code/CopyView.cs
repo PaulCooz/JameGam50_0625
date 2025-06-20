@@ -8,6 +8,10 @@ namespace JamSpace
     {
         [SerializeField]
         private CopyGenSetting copyGenSetting;
+        [SerializeField]
+        private EnergyView energyView;
+        [SerializeField]
+        private HintsView hintsView;
 
         [SerializeField]
         private CanvasGroup canvasGroup;
@@ -15,7 +19,7 @@ namespace JamSpace
         [SerializeField]
         private CopyPartView left, right;
 
-        private CopyData _data;
+        private LevelData _data;
 
         private void Awake()
         {
@@ -28,8 +32,9 @@ namespace JamSpace
             var rand = new System.Random(0);
             _data = copyGenSetting.Get(rand);
 
-            left.SetupCommandCopy(_data, true);
-            right.SetupCommandCopy(_data, false);
+            energyView.Setup(_data);
+            left.SetupCommandCopy(_data, true, hintsView.OnClickOp);
+            right.SetupCommandCopy(_data, false, _ => { });
             canvasGroup.blocksRaycasts = true;
             canvasGroup.DOFade(1, 0.3f);
         }
@@ -66,6 +71,7 @@ namespace JamSpace
         {
             canvasGroup.DOFade(0, 0.3f).OnComplete(() =>
             {
+                energyView.Teardown();
                 left.ClearViews();
                 right.ClearViews();
                 canvasGroup.blocksRaycasts = false;

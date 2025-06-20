@@ -20,12 +20,12 @@ namespace JamSpace
         private CopyOperatorView operatorPrefab;
 
         private bool[] _currentInput;
-        private CopyData _data;
+        private LevelData _data;
         private List<CommandInOutView> _inputButtons;
         private List<CommandInOutView> _outputButtons;
         private List<CopyOperatorView> _gridButtons;
 
-        public void SetupCommandCopy(CopyData data, bool hideOps)
+        public void SetupCommandCopy(LevelData data, bool hideOps, Action<CopyOperatorView> onClickOp)
         {
             _data = data;
             if (!hideOps)
@@ -78,6 +78,7 @@ namespace JamSpace
                     operatorView.Click();
                     operatorView.RefreshView();
                     RefreshOutputView();
+                    onClickOp(operatorView);
                 });
                 _gridButtons.Add(operatorView);
             }
@@ -94,17 +95,9 @@ namespace JamSpace
 
         public void ClearViews()
         {
-            Clear(_inputButtons);
-            Clear(_outputButtons);
-            Clear(_gridButtons);
-            return;
-
-            static void Clear<T>(List<T> objects) where T : Component
-            {
-                foreach (var b in objects)
-                    Destroy(b.gameObject);
-                objects.Clear();
-            }
+            this.DestroyAll(_inputButtons);
+            this.DestroyAll(_outputButtons);
+            this.DestroyAll(_gridButtons);
         }
 
         public bool[] Calc(bool[] input) => _data.Calc(input);

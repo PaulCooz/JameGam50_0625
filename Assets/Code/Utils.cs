@@ -21,6 +21,13 @@ namespace JamSpace
             return allIndexes.Take(count).ToArray();
         }
 
+        public static void DestroyAll<T>(this Object _, List<T> objects) where T : Component
+        {
+            foreach (var b in objects)
+                Object.Destroy(b.gameObject);
+            objects.Clear();
+        }
+
         public static void TryKill(this Tween t, bool complete = false)
         {
             if (t is { active: true })

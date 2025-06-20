@@ -1,1 +1,3 @@
 ﻿palette - https://lospec.com/palette-list/chasm
+planets - https://deep-fold.itch.io/pixel-planet-generator
+font    - https://datagoblin.itch.io/monogram
