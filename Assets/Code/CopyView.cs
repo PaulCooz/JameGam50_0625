@@ -33,8 +33,9 @@ namespace JamSpace
             _data = copyGenSetting.Get(rand);
 
             energyView.Setup(_data);
+            hintsView.Setup(energyView, _data);
             left.SetupCommandCopy(_data, true, hintsView.OnClickOp);
-            right.SetupCommandCopy(_data, false, _ => { });
+            right.SetupCommandCopy(new(_data), false, (_, _) => true);
             canvasGroup.blocksRaycasts = true;
             canvasGroup.DOFade(1, 0.3f);
         }

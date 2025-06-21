@@ -25,7 +25,7 @@ namespace JamSpace
         private List<CommandInOutView> _outputButtons;
         private List<CopyOperatorView> _gridButtons;
 
-        public void SetupCommandCopy(LevelData data, bool hideOps, Action<CopyOperatorView> onClickOp)
+        public void SetupCommandCopy(LevelData data, bool hideOps, Func<CopyOperatorView, List<CopyOperatorView>, bool> onClickOp)
         {
             _data = data;
             if (!hideOps)
@@ -75,10 +75,11 @@ namespace JamSpace
                 operatorView.RefreshView();
                 operatorView.onClick.AddListener(() =>
                 {
-                    operatorView.Click();
+                    var shouldPerformClick = onClickOp(operatorView, _gridButtons);
+                    if (shouldPerformClick)
+                        operatorView.Click();
                     operatorView.RefreshView();
                     RefreshOutputView();
-                    onClickOp(operatorView);
                 });
                 _gridButtons.Add(operatorView);
             }

@@ -33,17 +33,9 @@ namespace JamSpace
                 grid.Add(row);
             }
 
-            var timeToSolve = Pow(2, width) * OperatorExt.Count * width * height;
+            var timeToSolve = Utils.SexyPow(2, width) * OperatorExt.Count * width * height;
             Debug.Log($"TIME:{timeToSolve}");
             return new(timeToSolve, width, height, grid.SelectMany(r => r).ToArray());
-        }
-
-        private static int Pow(int b, int p)
-        {
-            if (p == 0)
-                return 1;
-            var x = Pow(b, p / 2);
-            return x * x * ((p & 1) == 1 ? b : 1);
         }
     }
 }

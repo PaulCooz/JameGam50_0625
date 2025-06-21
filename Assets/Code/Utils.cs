@@ -33,5 +33,21 @@ namespace JamSpace
             if (t is { active: true })
                 t.Kill(complete);
         }
+
+        public static int SexyPow(int b, int p) // 🍷🗿
+        {
+            if (p == 0)
+                return 1;
+            var x = SexyPow(b, p / 2);
+            return x * x * ((p & 1) == 1 ? b : 1);
+        }
+
+        public static double SexyPow(double b, int p) // 😎
+        {
+            if (p <= 0.0)
+                return 1.0;
+            var x = SexyPow(b, p / 2);
+            return x * x * ((p & 1) == 1 ? b : 1.0);
+        }
     }
 }

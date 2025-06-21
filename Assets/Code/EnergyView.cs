@@ -1,5 +1,4 @@
-﻿using System;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,31 +11,50 @@ namespace JamSpace
         [SerializeField]
         private TMP_Text leftTmp;
 
-        private double _totalEnergy;
-        private double _timeStart;
+        private LevelData _data;
 
-        private bool _update;
+        private bool _updating;
+        private double _timeLastDec;
 
         public void Setup(in LevelData data)
         {
-            _totalEnergy = data.totalEnergy;
-            _timeStart = Time.timeAsDouble;
-            _update = true;
+            _data = data;
+            _timeLastDec = Time.timeAsDouble;
+
+            SetAmount((float)_data.currentEnergy / _data.totalEnergy);
+            _updating = true;
         }
 
         private void Update()
         {
-            if (_update && Time.frameCount % 20 == 0)
+            if (_updating && Time.frameCount % 20 == 0)
             {
-                var e = Math.Max(_totalEnergy - (Time.timeAsDouble - _timeStart), 0.0) / _totalEnergy;
-                fill.fillAmount = (float)e;
-                leftTmp.text = $"{Mathf.FloorToInt(100 * fill.fillAmount)}<sprite=0>";
+                var time = Time.timeAsDouble;
+                if (time - _timeLastDec >= 1.0)
+                {
+                    _timeLastDec = time;
+                    _data.currentEnergy--;
+                }
+
+                var curr = (float)_data.currentEnergy / _data.totalEnergy;
+                var toAdd = Mathf.Sign(curr - fill.fillAmount) * 2f * Time.deltaTime;
+
+                // linear speed can fly over
+                if (Mathf.Sign(curr - fill.fillAmount) != Mathf.Sign(curr - (fill.fillAmount + toAdd)))
+                    toAdd = curr - fill.fillAmount;
+
+                SetAmount(fill.fillAmount + toAdd);
             }
         }
 
-        public void Teardown()
+        private void SetAmount(float value)
         {
-            _update = false;
+            fill.fillAmount = value;
+            leftTmp.text = $"{Mathf.FloorToInt(100 * fill.fillAmount)}<sprite=0>";
         }
+
+        public void SubtractEnergy(int energy) => _data.currentEnergy -= energy;
+
+        public void Teardown() => _updating = false;
     }
 }

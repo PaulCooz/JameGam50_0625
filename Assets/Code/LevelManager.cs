@@ -10,10 +10,9 @@ namespace JamSpace
         [SerializeField]
         private InputAction openInput;
 
-        private void Start()
-        {
-            openInput.Enable();
-        }
+        private void Awake() { Application.targetFrameRate = 60; }
+
+        private void Start() { openInput.Enable(); }
 
         private void Update()
         {
@@ -21,9 +20,6 @@ namespace JamSpace
                 OpenCopy();
         }
 
-        public void OpenCopy()
-        {
-            copyView.Show();
-        }
+        public void OpenCopy() { copyView.Show(); }
     }
 }

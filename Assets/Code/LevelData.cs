@@ -5,14 +5,22 @@ using UnityEngine;
 namespace JamSpace
 {
     [Serializable]
-    public struct LevelData
+    public class LevelData
     {
-        public int totalEnergy;
-        public int width;
-        public int height;
+        private int _currentEnergy;
 
         [SerializeField]
         private Operator[] ops;
+
+        public int width { get; }
+        public int height { get; }
+
+        public int totalEnergy { get; }
+        public int currentEnergy
+        {
+            get => _currentEnergy;
+            set => _currentEnergy = Math.Clamp(value, 0, totalEnergy);
+        }
 
         public Operator this[int h, int w]
         {
@@ -23,17 +31,21 @@ namespace JamSpace
         public LevelData(int totalEnergy, int width, int height, Operator[] ops)
         {
             this.totalEnergy = totalEnergy;
+            this.currentEnergy = this.totalEnergy;
+
             this.width = width;
             this.height = height;
             this.ops = ops;
         }
 
-        public LevelData(int totalEnergy, int width, int height, Operator[][] ops)
+        public LevelData(LevelData copy)
         {
-            this.totalEnergy = totalEnergy;
-            this.width = width;
-            this.height = height;
-            this.ops = ops.SelectMany(f => f).ToArray();
+            totalEnergy = copy.totalEnergy;
+            currentEnergy = totalEnergy;
+
+            width = copy.width;
+            height = copy.height;
+            ops = copy.ops;
         }
 
         public bool[] Calc(bool[] input)
@@ -62,10 +74,7 @@ namespace JamSpace
             return output;
         }
 
-        public void SetAllEmpty()
-        {
-            ops = ops.Select(o => Operator.Empty).ToArray();
-        }
+        public void SetAllEmpty() { ops = ops.Select(o => Operator.Empty).ToArray(); }
     }
 
     public enum Operator
@@ -83,6 +92,8 @@ namespace JamSpace
 
     public static class OperatorExt
     {
+        public const Operator TheLastOne = Operator.OrRight;
+
         public static readonly int Count = Enum.GetNames(typeof(Operator)).Length;
 
         public static Operator GetRandNonEmpty(System.Random rand, int j, int width)
