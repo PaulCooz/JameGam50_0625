@@ -10,6 +10,8 @@ namespace JamSpace
         private Image fill;
         [SerializeField]
         private TMP_Text leftTmp;
+        [SerializeField]
+        private TutorView tutorView;
 
         private LevelData _data;
 
@@ -27,6 +29,8 @@ namespace JamSpace
 
         private void Update()
         {
+            if (tutorView.open)
+                return;
             if (_updating && Time.frameCount % 20 == 0)
             {
                 var time = Time.timeAsDouble;
@@ -50,7 +54,7 @@ namespace JamSpace
         private void SetAmount(float value)
         {
             fill.fillAmount = value;
-            leftTmp.text = $"{Mathf.FloorToInt(100 * fill.fillAmount)}<sprite=0>";
+            leftTmp.text = $"{Mathf.RoundToInt(_data.totalEnergy * fill.fillAmount)}<sprite=0>";
         }
 
         public void SubtractEnergy(int energy) => _data.currentEnergy -= energy;

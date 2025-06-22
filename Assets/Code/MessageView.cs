@@ -17,11 +17,14 @@ namespace JamSpace
         private Vector3 _parentLBL, _parentLTR, _parentWBL, _parentWTR;
 
         private Tween _anim;
-        private bool _inProcess;
+        public bool inProcess { get; private set; }
 
+        private readonly Queue<(string msg, MType type)> _queueLocal = new();
         private static readonly Queue<(string msg, MType type)> Queue = new();
 
         public static void Push(string message, MType type = MType.Info) => Queue.Enqueue((message, type));
+
+        public void PushLocal(string message) => _queueLocal.Enqueue((message, MType.Info));
 
         private void Start()
         {
@@ -44,21 +47,22 @@ namespace JamSpace
             if (time - _lastUpdate > 1)
             {
                 _lastUpdate = time;
-                TryDequeue();
+                TryDequeue(_queueLocal);
+                TryDequeue(Queue);
             }
         }
 
-        private void TryDequeue()
+        private void TryDequeue(Queue<(string msg, MType type)> queue)
         {
-            if (Queue.Count > 0)
+            if (queue.Count > 0)
             {
-                if (_inProcess)
+                if (inProcess)
                 {
                     _anim.DOTimeScale(1000, 0.9f);
                 }
                 else
                 {
-                    var (m, t) = Queue.Dequeue();
+                    var (m, t) = queue.Dequeue();
                     PushMessageAsync(m).Forget();
                 }
             }
@@ -66,7 +70,7 @@ namespace JamSpace
 
         private async UniTask PushMessageAsync(string msg)
         {
-            _inProcess = true;
+            inProcess = true;
 
             _anim.TryKill();
             tmp.alpha = 0f;
@@ -92,7 +96,7 @@ namespace JamSpace
             _anim = tmp.rectTransform
                 .DOLocalMoveX(allHideX, Mathf.Abs(tmp.rectTransform.localPosition.x - allHideX) / timeScale)
                 .SetEase(Ease.Linear)
-                .OnComplete(() => _inProcess = false);
+                .OnComplete(() => inProcess = false);
         }
 
         public enum MType

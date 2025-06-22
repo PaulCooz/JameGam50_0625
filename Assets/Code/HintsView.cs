@@ -25,7 +25,7 @@ namespace JamSpace
         private float totalSize => _data.height * _data.width;
 
         private float GetEnForN(double forOne, int n) =>
-            (float)Math.Max(forOne * Utils.SexyPow(0.99, Mathf.Max(n, 1) - 1), 1.0);
+            (float)Math.Max(forOne * n * Utils.SexyPow(0.99, Mathf.Max(n, 1) - 1), 1.0);
 
         private float enForOne => Mathf.Max(totalSize > 1f ? totalEnergy / (totalSize - 1f) : 1f, 1f);
 
@@ -74,6 +74,21 @@ namespace JamSpace
         {
             _energyView = energyView;
             _data = data;
+            foreach (var t in toggles)
+            {
+                t.costTmp.text = t.hint switch
+                {
+                    Hint.One => $"{RoundEnergyForHint(enForOne)}",
+                    Hint.Row => $"{RoundEnergyForHint(enForRow)}",
+                    Hint.Col => $"{RoundEnergyForHint(enForCol)}",
+                    Hint.TryOne => $"{RoundEnergyForHint(enForRightTry)}/{RoundEnergyForHint(enForWrongTry)}",
+                    Hint.TryRow => $"{RoundEnergyForHint(enForRightTryRow)}/{RoundEnergyForHint(enForWrongTryRow)}",
+                    Hint.TryCol => $"{RoundEnergyForHint(enForRightTryCol)}/{RoundEnergyForHint(enForWrongTryCol)}",
+                    Hint.Clear => $"{RoundEnergyForHint(enForClear)}",
+                    Hint.Info => $"{(_data.usedInfoHint ? 0 : RoundEnergyForHint(enForInfo))}",
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
         }
 
         public bool OnClickOp(CopyOperatorView opView, IReadOnlyList<CopyOperatorView> all)
@@ -84,7 +99,7 @@ namespace JamSpace
                 if (t.isOn)
                 {
                     var energySub = t.perform(opView, all);
-                    _energyView.SubtractEnergy(Mathf.Max(Mathf.RoundToInt(energySub), 1));
+                    _energyView.SubtractEnergy(RoundEnergyForHint(energySub));
                     shouldPerformClick = false;
                     break;
                 }
@@ -93,6 +108,8 @@ namespace JamSpace
             DeactivateAllToggles();
             return shouldPerformClick;
         }
+
+        private static int RoundEnergyForHint(float energySub) => Mathf.Max(Mathf.RoundToInt(energySub), 1);
 
         private void DeactivateAllToggles() => toggleGroup.ActiveToggles().ToList().ForEach(t => t.isOn = false);
 
@@ -217,6 +234,7 @@ namespace JamSpace
             MessageView.Push(sb.ToString());
 
             _data.usedInfoHint = true;
+            toggles.Find(t => t.hint is Hint.Info).costTmp.text = "0";
             return enForInfo;
         }
 

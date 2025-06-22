@@ -52,7 +52,12 @@ namespace JamSpace
 
         private LevelData _data, _playerData;
 
-        private void Awake() { Application.targetFrameRate = 60; }
+        private void Awake()
+        {
+            Application.targetFrameRate = 60;
+            _screenHeight = Screen.height;
+            _screenWidth = Screen.width;
+        }
 
         public void Start()
         {
@@ -85,12 +90,39 @@ namespace JamSpace
             }).Forget();
         }
 
+        private int _screenHeight, _screenWidth;
+
+        private void Update()
+        {
+            if (Time.frameCount % 30 == 0 && raycaster.enabled &&
+                (_screenHeight != Screen.height || _screenWidth != Screen.width))
+            {
+                _screenHeight = Screen.height;
+                _screenWidth = Screen.width;
+
+                ReloadLevelForceAsync().Forget();
+            }
+        }
+
         public void Check()
         {
             if (copyView.IsAllDone())
                 NextLevelAsync(true).Forget();
             else
                 MessageView.Push("Wrong copy  ;(");
+        }
+
+        private async UniTask ReloadLevelForceAsync()
+        {
+            raycaster.enabled = false;
+
+            _data.OnAnyChange -= OnDataChange;
+            _playerData.OnAnyChange -= OnPlayerDataChange;
+
+            await copyView.Hide();
+
+            Start();
+            raycaster.enabled = true;
         }
 
         private async UniTask NextLevelAsync(bool isWin)
