@@ -36,7 +36,7 @@ namespace JamSpace
             _parentWBL = matL2W.MultiplyPoint(_parentLBL);
             _parentWTR = matL2W.MultiplyPoint(_parentLTR);
 
-            tmp.enabled = false;
+            tmp.alpha = 0;
         }
 
         private double _lastUpdate;
@@ -72,7 +72,7 @@ namespace JamSpace
             _inProcess = true;
 
             _anim.TryKill();
-            tmp.enabled = false;
+            tmp.alpha = 0f;
 
             tmp.text = msg;
 
@@ -86,13 +86,12 @@ namespace JamSpace
 
             var middleRight = new Vector3(_parentWTR.x, (_parentWTR.y + _parentWBL.y) / 2f, 0);
             tmp.rectTransform.position = middleRight;
-            tmp.rectTransform.localPosition += new Vector3(tmp.rectTransform.rect.width / 2f, 0, 0);
+            var renderedWidth = tmp.renderedWidth;
+            tmp.rectTransform.localPosition += new Vector3(renderedWidth / 2f, 0, 0);
 
-            tmp.enabled = true;
+            tmp.alpha = 1f;
 
-            await UniTask.NextFrame();
-
-            var allHideX = _parentLBL.x - tmp.rectTransform.rect.width / 2f;
+            var allHideX = _parentLBL.x - renderedWidth / 2f;
             _anim = tmp.rectTransform
                 .DOLocalMoveX(allHideX, Mathf.Abs(tmp.rectTransform.localPosition.x - allHideX) / timeScale)
                 .SetEase(Ease.Linear)

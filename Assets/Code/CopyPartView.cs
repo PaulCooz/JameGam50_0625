@@ -25,11 +25,10 @@ namespace JamSpace
         private List<CommandInOutView> _outputButtons;
         private List<CopyOperatorView> _gridButtons;
 
-        public void SetupCommandCopy(LevelData data, bool hideOps, Func<CopyOperatorView, List<CopyOperatorView>, bool> onClickOp)
+        public void SetupCommandCopy(
+            LevelData data, bool playerSide, Func<CopyOperatorView, List<CopyOperatorView>, bool> onClickOp)
         {
             _data = data;
-            if (!hideOps)
-                _data.SetAllEmpty();
 
             var spacing =
                 new Vector2((_data.width - 1) * gridParent.spacing.x, (_data.height - 1) * gridParent.spacing.y);
@@ -71,7 +70,7 @@ namespace JamSpace
             for (var j = 0; j < _data.width; j++)
             {
                 var operatorView = Instantiate(operatorPrefab, gridParent.transform);
-                operatorView.Setup(i, j, _data, hideOps);
+                operatorView.Setup(i, j, _data, playerSide);
                 operatorView.RefreshView();
                 operatorView.onClick.AddListener(() =>
                 {

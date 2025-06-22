@@ -9,6 +9,7 @@ namespace JamSpace
     {
         private State _state;
         private LevelData _data;
+        private bool _playerSide;
 
         [SerializeField]
         private TMP_Text tmp;
@@ -24,12 +25,17 @@ namespace JamSpace
         }
         public bool alreadyHinted => _state is State.Hinted;
 
-        public void Setup(int h, int w, LevelData data, bool hidden)
+        public void Setup(int h, int w, LevelData data, bool playerSide)
         {
             row = h;
             col = w;
             _data = data;
-            _state = hidden ? State.Hidden : State.Usable;
+            _playerSide = playerSide;
+
+            if (_playerSide)
+                _state = State.Usable;
+            else
+                _state = _data.GetHint(row, col) ? State.Hinted : State.Hidden;
         }
 
         public void Click()
@@ -98,6 +104,7 @@ namespace JamSpace
         public void HintOpen()
         {
             _state = State.Hinted;
+            _data.SetHint(row, col, true);
             RefreshView();
         }
 

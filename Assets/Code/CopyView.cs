@@ -7,8 +7,6 @@ namespace JamSpace
     public sealed class CopyView : MonoBehaviour
     {
         [SerializeField]
-        private CopyGenSetting copyGenSetting;
-        [SerializeField]
         private EnergyView energyView;
         [SerializeField]
         private HintsView hintsView;
@@ -27,15 +25,14 @@ namespace JamSpace
             canvasGroup.blocksRaycasts = false;
         }
 
-        public void Show()
+        public void Show(LevelData data, LevelData playerData)
         {
-            var rand = new System.Random(0);
-            _data = copyGenSetting.Get(rand);
+            _data = data;
 
             energyView.Setup(_data);
             hintsView.Setup(energyView, _data);
-            left.SetupCommandCopy(_data, true, hintsView.OnClickOp);
-            right.SetupCommandCopy(new(_data), false, (_, _) => true);
+            left.SetupCommandCopy(_data, false, hintsView.OnClickOp);
+            right.SetupCommandCopy(playerData, true, (_, _) => true);
             canvasGroup.blocksRaycasts = true;
             canvasGroup.DOFade(1, 0.3f);
         }

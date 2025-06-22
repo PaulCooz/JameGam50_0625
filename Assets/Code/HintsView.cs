@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,10 +12,12 @@ namespace JamSpace
     {
         [SerializeField]
         private ToggleGroup toggleGroup;
+        [SerializeField]
+        private List<HintToggle> toggles;
 
         private EnergyView _energyView;
 
-        private Dictionary<Hint, (bool toggle, Func<CopyOperatorView, IReadOnlyList<CopyOperatorView>, float>perform)>
+        private Dictionary<Hint, (bool isOn, Func<CopyOperatorView, IReadOnlyList<CopyOperatorView>, float> perform)>
             _hint;
 
         private LevelData _data;
@@ -42,8 +45,6 @@ namespace JamSpace
         private float enForClear => GetEnForOne(40 * _data.width * _data.height / 100);
         private float enForInfo => Mathf.Max(totalEnergy / 8f, 1f);
 
-        private Hint _toggleToSet;
-
         private void Awake()
         {
             _hint = new()
@@ -57,15 +58,16 @@ namespace JamSpace
                 [Hint.Clear] = (false, Clear),
                 [Hint.Info] = (false, Info),
             };
-        }
-
-        public void SetToggle(int h) => _toggleToSet = (Hint)h;
-
-        public void SetToggleHint(bool value)
-        {
-            var t = _hint[_toggleToSet];
-            t.toggle = value;
-            _hint[_toggleToSet] = t;
+            foreach (var t in toggles)
+            {
+                var hint = t.hint;
+                t.toggle.onValueChanged.AddListener(value =>
+                {
+                    var x = _hint[hint];
+                    x.isOn = value;
+                    _hint[hint] = x;
+                });
+            }
         }
 
         public void Setup(EnergyView energyView, LevelData data)
@@ -79,7 +81,7 @@ namespace JamSpace
             var shouldPerformClick = true;
             foreach (var (_, t) in _hint)
             {
-                if (t.toggle)
+                if (t.isOn)
                 {
                     var energySub = t.perform(opView, all);
                     _energyView.SubtractEnergy(Mathf.Max(Mathf.RoundToInt(energySub), 1));
@@ -190,7 +192,7 @@ namespace JamSpace
 
             var sb = new StringBuilder();
             sb.Append("There are ");
-            const string separator = " and ";
+            const string separator = ", ";
             var appendedSmth = false;
             foreach (var (op, count) in d)
             {
@@ -213,7 +215,17 @@ namespace JamSpace
                 sb.Append("nothing to do  :P");
 
             MessageView.Push(sb.ToString());
+
+            _data.usedInfoHint = true;
             return enForInfo;
+        }
+
+        [Serializable]
+        public struct HintToggle
+        {
+            public Hint hint;
+            public Toggle toggle;
+            public TMP_Text costTmp;
         }
 
         public enum Hint

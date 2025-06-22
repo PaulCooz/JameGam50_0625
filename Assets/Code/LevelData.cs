@@ -1,17 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
 
 namespace JamSpace
 {
-    [Serializable]
-    public class LevelData
+    public sealed class LevelData
     {
         private int _currentEnergy;
+        private readonly List<Operator> _ops;
 
-        [SerializeField]
-        private Operator[] ops;
+        private bool _usedInfoHint;
+        private readonly List<bool> _hinted;
 
+        public int number { get; }
         public int width { get; }
         public int height { get; }
 
@@ -19,34 +23,87 @@ namespace JamSpace
         public int currentEnergy
         {
             get => _currentEnergy;
-            set => _currentEnergy = Math.Clamp(value, 0, totalEnergy);
+            set
+            {
+                _currentEnergy = Math.Clamp(value, 0, totalEnergy);
+                OnAnyChange?.Invoke();
+            }
+        }
+
+        public bool usedInfoHint
+        {
+            get => _usedInfoHint;
+            set
+            {
+                _usedInfoHint = value;
+                OnAnyChange?.Invoke();
+            }
         }
 
         public Operator this[int h, int w]
         {
-            get => ops[h * width + w];
-            set => ops[h * width + w] = value;
+            get => _ops[h * width + w];
+            set
+            {
+                _ops[h * width + w] = value;
+                OnAnyChange?.Invoke();
+            }
         }
 
-        public LevelData(int totalEnergy, int width, int height, Operator[] ops)
+        public event Action OnAnyChange;
+
+        public LevelData(int number, int totalEnergy, int width, int height, List<Operator> ops)
         {
+            this.number = number;
+
             this.totalEnergy = totalEnergy;
             this.currentEnergy = this.totalEnergy;
 
             this.width = width;
             this.height = height;
-            this.ops = ops;
+            this._ops = ops;
+
+            this.usedInfoHint = false;
+            this._hinted = _ops.Select(_ => false).ToList();
         }
 
         public LevelData(LevelData copy)
         {
+            number = copy.number;
+
             totalEnergy = copy.totalEnergy;
             currentEnergy = totalEnergy;
 
             width = copy.width;
             height = copy.height;
-            ops = copy.ops;
+            _ops = new(copy._ops);
+
+            usedInfoHint = copy.usedInfoHint;
+            _hinted = new(copy._hinted);
         }
+
+        [Preserve, JsonConstructor]
+        public LevelData(
+            int number, int totalEnergy, int currentEnergy, int width, int height, List<Operator> operators,
+            bool usedInfoHint, List<bool> hinted
+        ) : this(number, totalEnergy, width, height, operators)
+        {
+            this._currentEnergy = currentEnergy;
+            this.usedInfoHint = usedInfoHint;
+            this._hinted = new(hinted);
+        }
+
+        public string ToJson() => new JObject
+        {
+            { "number", number },
+            { "totalEnergy", totalEnergy },
+            { "currentEnergy", currentEnergy },
+            { "width", width },
+            { "height", height },
+            { "operators", JArray.FromObject(_ops) },
+            { "usedInfoHint", usedInfoHint },
+            { "hinted", JArray.FromObject(_hinted) },
+        }.ToString(Formatting.None);
 
         public bool[] Calc(bool[] input)
         {
@@ -74,7 +131,20 @@ namespace JamSpace
             return output;
         }
 
-        public void SetAllEmpty() { ops = ops.Select(o => Operator.Empty).ToArray(); }
+        public bool GetHint(int h, int w) { return _hinted[h * width + w]; }
+
+        public void SetHint(int h, int w, bool value)
+        {
+            _hinted[h * width + w] = value;
+            OnAnyChange?.Invoke();
+        }
+
+        public void SetAllEmpty()
+        {
+            for (var i = 0; i < _ops.Count; i++)
+                _ops[i] = Operator.Empty;
+            OnAnyChange?.Invoke();
+        }
     }
 
     public enum Operator
