@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
@@ -11,6 +12,12 @@ namespace JamSpace
     {
         [SerializeField]
         private TutorFirstView firstTutorView;
+
+        private bool _wasFirstTutor;
+
+        [SerializeField]
+        private WhaleView whaleView;
+
         [SerializeField]
         private CopyView copyView;
         [SerializeField]
@@ -64,8 +71,11 @@ namespace JamSpace
 
         public async UniTaskVoid Start()
         {
+            await whaleView.animTcs.Task;
+
             if (!hasCurrLevel)
             {
+                _wasFirstTutor = true;
                 firstTutorView.Show();
                 await firstTutorView.hideTcs.Task;
             }
@@ -95,7 +105,14 @@ namespace JamSpace
             }
 
             levelTMP.text = $"LEVEL {_data.number}";
-            copyView.Show(_data, _playerData);
+            copyView.Show(_data, _playerData).OnComplete(() =>
+            {
+                if (_wasFirstTutor)
+                {
+                    MessageView.Push("Click \"?\" button on the upper right corner");
+                    _wasFirstTutor = false;
+                }
+            });
 
             _data.OnAnyChange += OnDataChange;
             _playerData.OnAnyChange += OnPlayerDataChange;

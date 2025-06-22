@@ -34,7 +34,6 @@ namespace JamSpace
             }
 
             var timeToSolve = Utils.SexyPow(2, width) * OperatorExt.Count * width * height;
-            Debug.Log($"TIME:{timeToSolve}");
             return new(number, timeToSolve, width, height, grid.SelectMany(r => r).ToList());
         }
     }

@@ -25,7 +25,7 @@ namespace JamSpace
             canvasGroup.blocksRaycasts = false;
         }
 
-        public void Show(LevelData data, LevelData playerData)
+        public Tween Show(LevelData data, LevelData playerData)
         {
             _data = data;
 
@@ -34,7 +34,7 @@ namespace JamSpace
             left.SetupCommandCopy(_data, false, hintsView.OnClickOp);
             right.SetupCommandCopy(playerData, true, (_, _) => true);
             canvasGroup.blocksRaycasts = true;
-            canvasGroup.DOFade(1, 0.3f);
+            return canvasGroup.DOFade(1, 0.4f);
         }
 
         public bool IsAllDone()
