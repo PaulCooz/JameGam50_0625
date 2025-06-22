@@ -630,8 +630,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 77646714}
-        m_TargetAssemblyTypeName: JamSpace.CommandView, Code
+      - m_Target: {fileID: 1621844021}
+        m_TargetAssemblyTypeName: JamSpace.LevelManager, Code
         m_MethodName: Check
         m_Mode: 1
         m_Arguments:
@@ -2308,7 +2308,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 0}
   tmp: {fileID: 1394922788}
-  timeScale: 333
+  timeScale: 350
 --- !u!1 &1242348670
 GameObject:
   m_ObjectHideFlags: 0
@@ -2816,7 +2816,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   copyView: {fileID: 77646714}
-  levelSetting: {fileID: 11400000, guid: e0760f003056f6f4bbaf8fc0df13651f, type: 2}
+  levelSettings:
+  - {fileID: 11400000, guid: e0760f003056f6f4bbaf8fc0df13651f, type: 2}
+  - {fileID: 11400000, guid: dc1bb7811ca610744b61a80890d6bd12, type: 2}
+  - {fileID: 11400000, guid: 1e0265b03da94234e8074638e3d0c0f9, type: 2}
+  - {fileID: 11400000, guid: a65266d8ac5d8c141945417cccad0bd6, type: 2}
+  - {fileID: 11400000, guid: 34635ac5ac9072444a2cbfd6ca2cee06, type: 2}
+  levelTMP: {fileID: 852939025}
+  raycaster: {fileID: 575695075}
 --- !u!1001 &1696882525
 PrefabInstance:
   m_ObjectHideFlags: 0

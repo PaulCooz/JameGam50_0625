@@ -1,6 +1,9 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Linq;
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace JamSpace
 {
@@ -9,12 +12,22 @@ namespace JamSpace
         [SerializeField]
         private CopyView copyView;
         [SerializeField]
-        private LevelSetting levelSetting;
+        private LevelSetting[] levelSettings;
+        [SerializeField]
+        private TMP_Text levelTMP;
+        [SerializeField]
+        private GraphicRaycaster raycaster;
 
         public static int currLevel
         {
             get => PlayerPrefs.GetInt("curr_level", 1);
             set => PlayerPrefs.SetInt("curr_level", value);
+        }
+
+        public static int currLevelSeed
+        {
+            get => PlayerPrefs.GetInt("curr_level_seed", 1);
+            set => PlayerPrefs.SetInt("curr_level_seed", value);
         }
 
         public static LevelData currLevelData
@@ -24,7 +37,7 @@ namespace JamSpace
                 var json = PlayerPrefs.GetString("curr_level_data", null);
                 return string.IsNullOrEmpty(json) ? null : JsonConvert.DeserializeObject<LevelData>(json);
             }
-            set => PlayerPrefs.SetString("curr_level_data", value.ToJson());
+            set => PlayerPrefs.SetString("curr_level_data", value?.ToJson());
         }
 
         public static LevelData currLevelPlayerData
@@ -34,8 +47,10 @@ namespace JamSpace
                 var json = PlayerPrefs.GetString("curr_level_player_data", null);
                 return string.IsNullOrEmpty(json) ? null : JsonConvert.DeserializeObject<LevelData>(json);
             }
-            set => PlayerPrefs.SetString("curr_level_player_data", value.ToJson());
+            set => PlayerPrefs.SetString("curr_level_player_data", value?.ToJson());
         }
+
+        private LevelData _data, _playerData;
 
         private void Awake() { Application.targetFrameRate = 60; }
 
@@ -43,26 +58,75 @@ namespace JamSpace
         {
             UniTask.NextFrame().ContinueWith(() =>
             {
-                var data = currLevelData;
-                var playerData = currLevelPlayerData;
-                if (data is null)
+                _data = currLevelData;
+                _playerData = currLevelPlayerData;
+                if (_data is null)
                 {
-                    var rand = new System.Random(currLevel);
-                    data = levelSetting.Get(currLevel, rand);
-                    playerData = null;
+                    var rand = new System.Random(currLevelSeed);
+                    var settings = currLevel - 1 >= levelSettings.Length
+                        ? levelSettings.Last()
+                        : levelSettings[currLevel - 1];
+
+                    _data = settings.Get(currLevel, rand);
+                    _playerData = null;
                 }
 
-                if (playerData is null)
+                if (_playerData is null)
                 {
-                    playerData = new(data);
-                    playerData.SetAllEmpty();
+                    _playerData = new(_data);
+                    _playerData.SetAllEmpty();
                 }
 
-                copyView.Show(data, playerData);
+                levelTMP.text = $"LEVEL {_data.number}";
+                copyView.Show(_data, _playerData);
 
-                data.OnAnyChange += () => currLevelData = data;
-                playerData.OnAnyChange += () => currLevelPlayerData = playerData;
+                _data.OnAnyChange += OnDataChange;
+                _playerData.OnAnyChange += OnPlayerDataChange;
             }).Forget();
         }
+
+        public void Check()
+        {
+            if (copyView.IsAllDone())
+                NextLevelAsync(true).Forget();
+            else
+                MessageView.Push("Wrong copy  ;(");
+        }
+
+        private async UniTask NextLevelAsync(bool isWin)
+        {
+            raycaster.enabled = false;
+
+            MessageView.Push(isWin ? "ALL DONE!" : "ENERGY IS OVER  ¯\\_(- ъ -)_/¯");
+
+            _data.OnAnyChange -= OnDataChange;
+            _playerData.OnAnyChange -= OnPlayerDataChange;
+            _data = _playerData = null;
+            currLevelData = currLevelPlayerData = null;
+
+            if (isWin)
+                currLevel++;
+            currLevelSeed++;
+
+            copyView.ForceShowLeft();
+
+            await UniTask.WaitForSeconds(4.5f);
+            MessageView.Push("");
+            await UniTask.WaitForSeconds(0.5f);
+
+            await copyView.Hide();
+
+            Start();
+            raycaster.enabled = true;
+        }
+
+        private void OnDataChange()
+        {
+            currLevelData = _data;
+            if (_data.currentEnergy <= 0)
+                NextLevelAsync(false).Forget();
+        }
+
+        private void OnPlayerDataChange() => currLevelPlayerData = _playerData;
     }
 }

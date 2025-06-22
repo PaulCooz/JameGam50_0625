@@ -66,6 +66,12 @@ namespace JamSpace
             }
         }
 
+        public void ForceShow()
+        {
+            _state = State.Hinted;
+            RefreshView();
+        }
+
         public void RefreshView()
         {
             if (_state is State.Hidden)

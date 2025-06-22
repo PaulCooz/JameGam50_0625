@@ -3,14 +3,11 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace JamSpace
 {
     public sealed class MessageView : MonoBehaviour
     {
-        [SerializeField]
-        private Image icon;
         [SerializeField]
         private TMP_Text tmp;
 

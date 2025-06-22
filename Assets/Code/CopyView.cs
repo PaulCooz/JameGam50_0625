@@ -37,7 +37,7 @@ namespace JamSpace
             canvasGroup.DOFade(1, 0.3f);
         }
 
-        public void Check()
+        public bool IsAllDone()
         {
             var input = new bool[_data.width];
             var allDone = true;
@@ -59,15 +59,14 @@ namespace JamSpace
                 }
             }
 
-            if (!allDone)
-                Debug.Log("==> BAD");
-            else
-                Debug.Log("==> GOOD!");
+            return allDone;
         }
 
-        public void Hide()
+        public void ForceShowLeft() { left.ShowAll(); }
+
+        public Tween Hide()
         {
-            canvasGroup.DOFade(0, 0.3f).OnComplete(() =>
+            return canvasGroup.DOFade(0, 0.3f).OnComplete(() =>
             {
                 energyView.Teardown();
                 left.ClearViews();

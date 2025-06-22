@@ -93,6 +93,12 @@ namespace JamSpace
                 _outputButtons[j].RefreshView(output[j]);
         }
 
+        public void ShowAll()
+        {
+            foreach (var opView in _gridButtons)
+                opView.ForceShow();
+        }
+
         public void ClearViews()
         {
             this.DestroyAll(_inputButtons);
