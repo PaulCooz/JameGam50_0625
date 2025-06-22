@@ -6,43 +6,16 @@
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes">
     <title>{{{ PRODUCT_NAME }}}</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <style>
-      .fullscreen_btn {
-        opacity: .4;
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        margin: 8px;
-        font-size: 16px;
-        display: block;
-        transition: opacity 0.4s;
-        background: none;
-        padding: 0;
-        border: 0;
-        cursor: pointer;
-      }
-
-      .fullscreen_btn img {
-        display: block;
-        width: 30px;
-        height: 30px;
-      }
-
-      .fullscreen_btn:hover {
-        opacity: .8;
-      }
-
-      canvas {
-        width: 100%;
-        height: 100%;
-        position: fixed;
-        background: {{{BACKGROUND_COLOR}}};
-      }
-    </style>
+    <link rel="stylesheet" href="style.css">
   </head>
   <body style="text-align: left; padding: 0; border: 0; margin: 0;">
     <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}} tabindex="-1" ></canvas>
-    <button class="fullscreen_btn" onclick="show_fullscreen()">
+    <div id="unity-loading-bar">
+      <div id="unity-progress-bar-empty">
+        <div id="unity-progress-bar-full"></div>
+      </div>
+    </div>
+    <button id="fullscreen" class="fullscreen_btn" onclick="show_fullscreen()">
       <img src="fullscreen.svg" alt="fullscreen"/>
     </button>
     <script src="Build/{{{ LOADER_FILENAME }}}"></script>
@@ -64,16 +37,32 @@
         companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
         productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
         productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
-      };
+      }
+
+      if (isMobileDevice())
+        document.querySelector("#fullscreen").remove()
+
+      document.querySelector("#unity-loading-bar").style.display = "block";
 
       let unityHandle = null;
-      createUnityInstance(document.querySelector("#unity-canvas"), config)
-        .then((unityInstance) => unityHandle = unityInstance)
+      createUnityInstance(
+              document.querySelector("#unity-canvas"),
+              config,
+              (progress) => document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%"
+      )
+        .then((unityInstance) => {
+          document.querySelector("#unity-loading-bar").style.display = "none";
+          unityHandle = unityInstance
+        })
         .catch((message) => alert(message));
 
       function show_fullscreen() {
         if (unityHandle)
           unityHandle.SetFullscreen(1);
+      }
+
+      function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       }
     </script>
   </body>

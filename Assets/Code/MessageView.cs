@@ -58,21 +58,26 @@ namespace JamSpace
             {
                 if (inProcess)
                 {
-                    _anim.DOTimeScale(1000, 0.9f);
+                    SpeedUp();
                 }
                 else
                 {
                     var (m, t) = queue.Dequeue();
-                    PushMessageAsync(m).Forget();
+                    if (string.IsNullOrEmpty(m))
+                        SpeedUp();
+                    else
+                        PushMessageAsync(m).Forget();
                 }
             }
         }
 
+        private void SpeedUp() => _anim?.DOTimeScale(100, 0.9f);
+
         private async UniTask PushMessageAsync(string msg)
         {
-            inProcess = true;
+            _anim.TryKill(true);
 
-            _anim.TryKill();
+            inProcess = true;
             tmp.alpha = 0f;
 
             tmp.text = msg;
