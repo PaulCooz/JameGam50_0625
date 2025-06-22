@@ -62,6 +62,8 @@ namespace JamSpace
 
             SetupGrid(inputParent, minSide, _data.width, 1);
             SetupGrid(outputParent, minSide, _data.width, 1);
+            gridParent.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+            gridParent.constraintCount = _data.height;
             SetupGrid(gridParent, minSide, _data.width, _data.height);
 
             _currentInput = new bool[_data.width];

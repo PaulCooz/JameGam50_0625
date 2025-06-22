@@ -31,7 +31,7 @@ namespace JamSpace
         {
             if (tutorView.open)
                 return;
-            if (_updating && Time.frameCount % 20 == 0)
+            if (_updating)
             {
                 var time = Time.timeAsDouble;
                 if (time - _timeLastDec >= 1.0)

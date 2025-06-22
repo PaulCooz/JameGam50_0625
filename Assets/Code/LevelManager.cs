@@ -10,6 +10,8 @@ namespace JamSpace
     public sealed class LevelManager : MonoBehaviour
     {
         [SerializeField]
+        private TutorFirstView firstTutorView;
+        [SerializeField]
         private CopyView copyView;
         [SerializeField]
         private LevelSetting[] levelSettings;
@@ -18,6 +20,7 @@ namespace JamSpace
         [SerializeField]
         private GraphicRaycaster raycaster;
 
+        public static bool hasCurrLevel => PlayerPrefs.HasKey("curr_level");
         public static int currLevel
         {
             get => PlayerPrefs.GetInt("curr_level", 1);
@@ -59,35 +62,43 @@ namespace JamSpace
             _screenWidth = Screen.width;
         }
 
-        public void Start()
+        public async UniTaskVoid Start()
         {
-            UniTask.NextFrame().ContinueWith(() =>
+            if (!hasCurrLevel)
             {
-                _data = currLevelData;
-                _playerData = currLevelPlayerData;
-                if (_data is null)
-                {
-                    var rand = new System.Random(currLevelSeed);
-                    var settings = currLevel - 1 >= levelSettings.Length
-                        ? levelSettings.Last()
-                        : levelSettings[currLevel - 1];
+                firstTutorView.Show();
+                await firstTutorView.hideTcs.Task;
+            }
 
-                    _data = settings.Get(currLevel, rand);
-                    _playerData = null;
-                }
+            UniTask.NextFrame().ContinueWith(PlayLevel).Forget();
+        }
 
-                if (_playerData is null)
-                {
-                    _playerData = new(_data);
-                    _playerData.SetAllEmpty();
-                }
+        private void PlayLevel()
+        {
+            _data = currLevelData;
+            _playerData = currLevelPlayerData;
+            if (_data is null)
+            {
+                var rand = new System.Random(currLevelSeed);
+                var settings = currLevel - 1 >= levelSettings.Length
+                    ? levelSettings.Last()
+                    : levelSettings[currLevel - 1];
 
-                levelTMP.text = $"LEVEL {_data.number}";
-                copyView.Show(_data, _playerData);
+                _data = settings.Get(currLevel, rand);
+                _playerData = null;
+            }
 
-                _data.OnAnyChange += OnDataChange;
-                _playerData.OnAnyChange += OnPlayerDataChange;
-            }).Forget();
+            if (_playerData is null)
+            {
+                _playerData = new(_data);
+                _playerData.SetAllEmpty();
+            }
+
+            levelTMP.text = $"LEVEL {_data.number}";
+            copyView.Show(_data, _playerData);
+
+            _data.OnAnyChange += OnDataChange;
+            _playerData.OnAnyChange += OnPlayerDataChange;
         }
 
         private int _screenHeight, _screenWidth;
@@ -121,7 +132,7 @@ namespace JamSpace
 
             await copyView.Hide();
 
-            Start();
+            PlayLevel();
             raycaster.enabled = true;
         }
 
@@ -148,7 +159,7 @@ namespace JamSpace
 
             await copyView.Hide();
 
-            Start();
+            PlayLevel();
             raycaster.enabled = true;
         }
 

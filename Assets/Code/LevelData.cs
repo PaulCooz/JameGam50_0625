@@ -162,8 +162,6 @@ namespace JamSpace
 
     public static class OperatorExt
     {
-        public const Operator TheLastOne = Operator.OrRight;
-
         public static readonly int Count = Enum.GetNames(typeof(Operator)).Length;
 
         public static Operator GetRandNonEmpty(System.Random rand, int j, int width)

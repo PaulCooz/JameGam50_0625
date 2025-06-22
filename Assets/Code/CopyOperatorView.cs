@@ -49,14 +49,13 @@ namespace JamSpace
                 }
                 else if (_state is State.Guessed)
                 {
-                    if (guess is OperatorExt.TheLastOne)
+                    var prev = guess ?? Operator.Empty;
+                    guess = guess?.MoveNext(col, _data.width);
+
+                    if (prev > guess)
                     {
                         guess = null;
                         _state = State.Hidden;
-                    }
-                    else
-                    {
-                        guess = guess?.MoveNext(col, _data.width);
                     }
                 }
             }
