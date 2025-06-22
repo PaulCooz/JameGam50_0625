@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -21,6 +22,9 @@ namespace JamSpace
 
         [SerializeField]
         private List<RectTutor> tutors;
+
+        [SerializeField]
+        private UnityEvent clickForInfo;
 
         private MessageView _infoMessage;
         private readonly List<Component> _toRemove = new();
@@ -83,6 +87,8 @@ namespace JamSpace
         {
             if (group.blocksRaycasts && clickAction.WasPerformedThisFrame())
             {
+                clickForInfo.Invoke();
+
                 var pos = Pointer.current.position.value;
                 foreach (var t in tutors)
                 {

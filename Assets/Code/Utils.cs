@@ -21,6 +21,18 @@ namespace JamSpace
             return allIndexes.Take(count).ToArray();
         }
 
+        public static List<T> RandomShuffle<T>(this IReadOnlyList<T> list)
+        {
+            var res = new List<T>(list);
+            for (var i = 0; i < res.Count; i++)
+            {
+                var swap = Random.Range(0, res.Count);
+                (res[i], res[swap]) = (res[swap], res[i]);
+            }
+
+            return res;
+        }
+
         public static void DestroyAll<T>(this Object _, List<T> objects) where T : Component
         {
             foreach (var b in objects)

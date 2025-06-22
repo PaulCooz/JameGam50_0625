@@ -1,3 +1,5 @@
 ﻿palette - https://lospec.com/palette-list/chasm
 planets - https://deep-fold.itch.io/pixel-planet-generator
 font    - https://datagoblin.itch.io/monogram
+sfx     - https://kenney.nl/assets/ui-audio
+music   - monumentstudios/Cinematic Atmos Vol 2

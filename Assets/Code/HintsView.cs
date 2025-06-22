@@ -233,9 +233,10 @@ namespace JamSpace
 
             MessageView.Push(sb.ToString());
 
+            var energy = _data.usedInfoHint ? 0 : enForInfo;
             _data.usedInfoHint = true;
             toggles.Find(t => t.hint is Hint.Info).costTmp.text = "0";
-            return enForInfo;
+            return energy;
         }
 
         [Serializable]

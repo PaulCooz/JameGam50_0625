@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace JamSpace
@@ -26,6 +27,9 @@ namespace JamSpace
         private CommandInOutView inOutPrefab;
         [SerializeField]
         private CopyOperatorView operatorPrefab;
+
+        [SerializeField]
+        private UnityEvent anyClick;
 
         private bool[] _currentInput;
         private LevelData _data;
@@ -73,6 +77,8 @@ namespace JamSpace
                 inButton.RefreshView(_currentInput[index]);
                 inButton.onClick.AddListener(() =>
                 {
+                    anyClick.Invoke();
+
                     _currentInput[index] = !_currentInput[index];
                     _inputButtons[index].RefreshView(_currentInput[index]);
                     RefreshOutputView();
@@ -93,6 +99,8 @@ namespace JamSpace
                 operatorView.RefreshView();
                 operatorView.onClick.AddListener(() =>
                 {
+                    anyClick.Invoke();
+
                     var shouldPerformClick = onClickOp(operatorView, _gridButtons);
                     if (shouldPerformClick)
                         operatorView.Click();

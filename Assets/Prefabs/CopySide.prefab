@@ -61,6 +61,9 @@ MonoBehaviour:
   outputParent: {fileID: 2899991829442689459}
   inOutPrefab: {fileID: 2052732067293041736, guid: 9c01fac8bc950c84d8193da199c32ed8, type: 3}
   operatorPrefab: {fileID: 7444937216464150486, guid: f5469bd4a0bef894d8f97b5a856705ef, type: 3}
+  anyClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!222 &3336468252863578172
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -82,7 +85,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2901961, g: 0.7254902, b: 0.6392157, a: 0.5019608}
+  m_Color: {r: 0.3647059, g: 0.75686276, b: 0.5647059, a: 0.78431374}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
