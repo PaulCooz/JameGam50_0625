@@ -5,14 +5,14 @@ namespace JamSpace
 {
     public sealed class CommandInOutView : Button
     {
-        public void Setup(bool isInteractable)
-        {
-            interactable = isInteractable;
-        }
+        public bool value { get; private set; }
+
+        public void Setup(bool isInteractable) => interactable = isInteractable;
 
         public void RefreshView(bool bit)
         {
-            image.color = bit ? colors.selectedColor : colors.disabledColor;
+            value = bit;
+            image.color = value ? colors.selectedColor : colors.disabledColor;
         }
     }
 }

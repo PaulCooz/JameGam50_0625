@@ -76,7 +76,7 @@ namespace JamSpace
         {
             if (_state is State.Hidden)
             {
-                tmp.text = "?";
+                tmp.text = "??";
             }
             else if (_state is State.Guessed)
             {
